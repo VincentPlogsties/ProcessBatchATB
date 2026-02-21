@@ -11,14 +11,6 @@
 #'   `Analysen*.xlsx` files, passed to [import_analytik_batch()]. Default `"Data"`.
 #' @param bad_channels Character vector. Measurement positions to exclude.
 #'   Default `character(0)`.
-#' @param analytik_pattern Regular expression for analytics file matching.
-#'   Default `"Analysen.*\\.xlsx$"`. Passed to [import_analytik_batch()].
-#' @param sample_sheet Character scalar. Sheet name for the sample table.
-#'   Default `"Proben"`.
-#' @param sample_range Character scalar. Cell range for the sample table.
-#'   Default `"A4:BQ71"`.
-#' @param gas_sheets Character vector. Gas measurement sheet names.
-#'   Default `c("w1","w2","w3","w4","w5","w6")`.
 #'
 #' @return A named list with elements:
 #' \describe{
@@ -91,6 +83,7 @@ run_batch_pipeline <- function(
     gas          = df_gas,
     daily        = df_daily,
     condition    = termination_result$condition,
+    abbruch      = termination_result$abbruch,
     abbruch_wide = termination_result$abbruch_wide,
     yields       = df_yields,
     validity     = df_validity

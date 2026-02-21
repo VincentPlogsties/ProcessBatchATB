@@ -5,7 +5,7 @@ Authors@R:
     person("Given", "Family", , "email@example.com", role = c("aut", "cre"))
 Description: Provides a reproducible pipeline for processing batch fermentation
     (biochemical methane potential, BMP) assay data within the standard method 
-    of the working group "biogenic ressources" of ATB,following VDI 4630. Handles
+    of the working group "biogenic ressources" of ATB, following VDI 4630. Handles
     import of sample protocols and gas measurement sheets, calculates normalised
     biogas and methane volumes, applies blank correction, evaluates the VDI 4630
     termination criterion, and summarises daily and cumulative yields per
@@ -25,7 +25,8 @@ Imports:
     lubridate,
     janitor,
     tibble,
-    rlang
+    rlang,
+    ggplot2
 Remotes:
     https://github.com/VincentPlogsties/ProcessLabAssistantATB.git
 Suggests:

@@ -25,15 +25,15 @@
 #'   `wanne`, `platz`, `messplatz`, `probe`, `datum`, `day`,
 #'   `vol_norm_net`, and `vol_norm_net_cum`.
 #'
-#' @return A named list with two elements:
+#' @return A named list with three elements:
 #' \describe{
 #'   \item{`condition`}{Tibble with one row per `(probe, day)` and columns
-#'     `condition_variant`, `continue_test`, and `keep_values`. Join to
-#'     [calc_daily()] output on `c("probe", "day")` and filter to
-#'     `keep_values == TRUE` to retain only valid days.}
-#'   \item{`abbruch_wide`}{Wide-format tibble with one row per `(datum, day)`
-#'     and one column per `messplatz`, containing `vol_perc`. Useful for
-#'     inspection and export.}
+#'     `condition_variant`, `continue_test`, and `keep_values`. Pass to
+#'     [calc_yields()].}
+#'   \item{`abbruch`}{Long-format tibble with `vol_perc` per `(messplatz, day)`.
+#'     Pass to [plot_qc()].}
+#'   \item{`abbruch_wide`}{Wide-format version of `abbruch` with one column
+#'     per `messplatz`. Useful for export.}
 #' }
 #'
 #' @references
@@ -108,5 +108,5 @@ calc_termination <- function(df_gas, df_daily) {
     ) |>
     dplyr::ungroup()
 
-  list(condition = condition, abbruch_wide = abbruch_wide)
+  list(condition = condition, abbruch_wide = abbruch_wide, abbruch = df_abbruch)
 }

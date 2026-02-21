@@ -19,18 +19,6 @@ containing both the sample sheet and gas measurement sheets. Default \code{"Data
 
 \item{bad_channels}{Character vector. Measurement positions to exclude.
 Default \code{character(0)}.}
-
-\item{analytik_pattern}{Regular expression for analytics file matching.
-Default \code{"Analysen.*\\\\.xlsx$"}. Passed to \code{\link[=import_analytik_batch]{import_analytik_batch()}}.}
-
-\item{sample_sheet}{Character scalar. Sheet name for the sample table.
-Default \code{"Proben"}.}
-
-\item{sample_range}{Character scalar. Cell range for the sample table.
-Default \code{"A4:BQ71"}.}
-
-\item{gas_sheets}{Character vector. Gas measurement sheet names.
-Default \code{c("w1","w2","w3","w4","w5","w6")}.}
 }
 \value{
 A named list with elements:
