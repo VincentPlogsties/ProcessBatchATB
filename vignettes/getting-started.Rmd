@@ -1,0 +1,109 @@
+---
+title: "Getting started with ProcessBatchATB"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with ProcessBatchATB}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", eval = FALSE)
+library(ProcessBatchATB)
+```
+
+## Overview
+
+`ProcessBatchATB` processes batch fermentation (BMP) assay data following
+VDI 4630. Analytics (substrate characterisation, inoculum) are processed
+via `ProcessLabAssistant` under the hood — users of this package only ever
+call `ProcessBatchATB` functions directly.
+
+## Pipeline
+
+| Step | Function | Description |
+|------|----------|-------------|
+| 1 | `import_analytik_batch()` | Analytics export files |
+| 2 | `import_samples()` | Sample protocol sheet |
+| 3 | `import_gaswerte()` | Gas measurement sheets (w1–w6) |
+| 4 | `process_analytik()` | Clean/transform analytics, compute inoculum blank mean |
+| 5 | `calc_gasvol()` | Normalised volumes, blank correction, cumulative sums |
+| 6 | `calc_daily()` | Daily aggregation, day counter |
+| 7 | `calc_termination()` | VDI 4630 stop criterion |
+| 8 | `calc_yields()` | Biogas and methane yields per ODM |
+| 9 | `check_validity()` | Pairwise replicate deviation |
+
+## Quick start
+
+```{r pipeline}
+library(ProcessBatchATB)
+
+results <- run_batch_pipeline(
+  protokoll_path = "data/Protokoll_VersuchXY.xlsx",
+  analytik_path  = "data/Analysen",
+  bad_channels   = c()   # e.g. c("W1P3") to exclude a faulty position
+)
+
+results$yields      # daily biogas + methane yields per ODM
+results$validity    # pairwise replicate deviations (VDI 4630)
+results$termination # which days are valid per variant
+```
+
+## Step-by-step
+
+```{r step-by-step}
+# 1. Import
+raw      <- import_analytik_batch("data/Analysen")
+samples  <- import_samples("data/Protokoll.xlsx")
+gaswerte <- import_gaswerte("data/Protokoll.xlsx")
+
+# 2. Process analytics
+result <- process_analytik(raw, samples)
+# result$analytik  -- cleaned/transformed analytics + inoculum blank mean
+# result$proben    -- sample table with TS values and ODM weighings joined
+
+# 3. Gas calculations
+df_gas   <- calc_gasvol(gaswerte, result$proben)
+df_daily <- calc_daily(df_gas)
+
+# 4. Termination + yields
+df_term   <- calc_termination(df_gas, df_daily)
+df_yields <- calc_yields(df_daily, df_term)
+df_valid  <- check_validity(df_yields, result$proben)
+```
+
+## Termination criterion (VDI 4630)
+
+A variant is considered complete when the daily specific biogas production
+rate falls to **≤ 0.5% of cumulative production per day** for three
+consecutive days, with this condition only evaluated after **day 25**.
+
+## Normalisation
+
+Gas volumes are corrected for temperature and pressure deviations from
+standard conditions (0 °C, 1013.25 hPa) using:
+
+$$
+f_{norm} = \frac{(p - p_{H_2O}) \times 273.15}{1013.25 \times (273.15 + T)}
+$$
+
+where $p_{H_2O} = -4.3965 + 9.7962 \times e^{0.0521 \times T}$.
+
+## Relationship to ProcessLabAssistant
+
+`ProcessBatchATB` depends on `ProcessLabAssistant` for the analytics
+cleaning and transformation logic, but this is handled internally —
+users only call `ProcessBatchATB` functions:
+
+```
+ProcessBatchATB                      ProcessLabAssistant (internal)
+───────────────────────────          ──────────────────────────────
+import_analytik_batch()   ────────►  import_analytik()
+process_analytik()        ────────►  clean_analytik()
+                                     transform_analytik()
+calc_gasvol()
+calc_daily()
+calc_termination()
+calc_yields()
+check_validity()
+```
