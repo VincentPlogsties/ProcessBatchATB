@@ -8,20 +8,6 @@ calc_yields(df_daily, df_termination)
 }
 \arguments{
 \item{df_daily}{A tibble as returned by \code{\link[=calc_daily]{calc_daily()}}.}
-
-\item{df_termination}{The \verb{$condition} element of the list returned by
-\code{\link[=calc_termination]{calc_termination()}}, containing columns \code{probe}, \code{day},
-\code{condition_variant}, \code{continue_test}, and \code{keep_values}.}
-}
-\value{
-A tibble of daily values filtered to \code{keep_values == TRUE}, with
-additional columns:
-\describe{
-\item{\code{biogas_yield_odm}}{Cumulative normalised biogas volume per g ODM
-(mL/g VS).}
-\item{\code{methane_yield_odm}}{Cumulative normalised methane volume per g ODM
-(mL/g VS).}
-}
 }
 \description{
 Applies the VDI 4630 termination criterion to the daily data and calculates
@@ -31,8 +17,8 @@ cumulative biogas and methane yields normalised to organic dry matter
 \examples{
 \dontrun{
 daily      <- calc_daily(df_gas)
-termresult <- calc_termination(df_gas, daily)
-results    <- calc_yields(daily, termresult$condition)
+results <- calc_termination(df_gas, daily)
+results    <- calc_yields(daily, result$condition)
 }
 
 }

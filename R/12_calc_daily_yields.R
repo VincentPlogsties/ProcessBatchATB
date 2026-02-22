@@ -72,27 +72,32 @@ calc_daily <- function(df_gas) {
 #'   [calc_termination()], containing columns `probe`, `day`,
 #'   `condition_variant`, `continue_test`, and `keep_values`.
 #'
-#' @return A tibble of daily values filtered to `keep_values == TRUE`, with
-#'   additional columns:
+#' @return A named list with two elements:
 #' \describe{
-#'   \item{`biogas_yield_odm`}{Cumulative normalised biogas volume per g ODM
-#'     (mL/g VS).}
-#'   \item{`methane_yield_odm`}{Cumulative normalised methane volume per g ODM
-#'     (mL/g VS).}
+#'   \item{`yields_daily`}{Tibble of daily values filtered to
+#'     `keep_values == TRUE`, with additional columns `biogas_yield_odm`
+#'     (mL/g VS), `methane_yield_odm` (mL/g VS), and `methane_perc` (%).}
+#'   \item{`yields`}{Tibble of final summarised values per measurement
+#'     position (`last` day per `messplatz`), with the same yield columns
+#'     as `yields_daily`.}
 #' }
 #'
 #' @seealso [calc_daily()], [calc_termination()], [check_validity()]
 #'
 #' @examples
 #' \dontrun{
-#' daily      <- calc_daily(df_gas)
-#' termresult <- calc_termination(df_gas, daily)
-#' results    <- calc_yields(daily, termresult$condition)
+#' daily  <- calc_daily(df_gas)
+#' term   <- calc_termination(df_gas, daily)
+#' result <- calc_yields(daily, term$condition)
+#'
+#' result$yields_daily  # one row per (messplatz, day)
+#' result$yields        # one row per messplatz, final values only
 #' }
 #'
 #' @export
+
 calc_yields <- function(df_daily, df_termination) {
-  df_daily |>
+  yields_daily <- df_daily |>
     dplyr::left_join(df_termination, by = c("probe", "day")) |>
     dplyr::filter(keep_values == TRUE) |>
     dplyr::select(-c(keep_values, continue_test, condition_variant)) |>
@@ -109,4 +114,10 @@ calc_yields <- function(df_daily, df_termination) {
         "vol_norm_net_cum", "vol_norm_net_methan_cum"
       ))
     )
+  yields <- yields_daily |>
+    dplyr::group_by(projekt, wanne, platz, messplatz, analytik_nr, probe)|>
+    dplyr::summarise(
+      dplyr::across(c("day", "methane_perc", "biogas_yield_odm", "methane_yield_odm"), dplyr::last)
+    )
+  list(yields_daily = yields_daily, yields =yields)
 }

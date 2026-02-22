@@ -36,9 +36,9 @@
 "_PACKAGE"
 
 ## usethis namespace: start
-#' @importFrom dplyr across all_of any_of arrange bind_rows case_when cumsum
+#' @importFrom dplyr across all_of any_of arrange bind_rows case_when
 #'   filter first group_by if_else inner_join join_by lag last left_join mutate
-#'   n reframe relocate rename rename_with select summarise ungroup unnest
+#'   n reframe relocate rename rename_with select summarise ungroup
 #' @importFrom tidyr drop_na pivot_longer pivot_wider replace_na unnest
 #' @importFrom purrr map
 #' @importFrom readxl read_xlsx
@@ -47,5 +47,6 @@
 #' @importFrom lubridate as_date as_datetime seconds_to_period
 #' @importFrom janitor clean_names remove_empty
 #' @importFrom rlang abort
+#' @importFrom forcats fct_inorder
 ## usethis namespace: end
 NULL

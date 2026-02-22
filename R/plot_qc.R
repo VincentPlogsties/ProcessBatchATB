@@ -36,18 +36,36 @@
 #' }
 #'
 #' @export
+
 plot_qc <- function(df_daily, df_abbruch) {
 
-  probes <- levels(factor(df_daily$probe))
+  # Order of messplatz according to (wanne, platz)
+  ordered_levels <- df_daily |>
+    dplyr::arrange(wanne, platz) |>
+    dplyr::distinct(messplatz) |>
+    dplyr::pull(messplatz)
 
+  # Order of probes according to (wanne, platz)
+  probes <- df_daily |>
+    dplyr::arrange(wanne, platz) |>
+    dplyr::distinct(probe) |>
+    dplyr::pull(probe)
+
+  # Loop in correct order (character vector preserves order)
   for (i in probes) {
 
-    # --- plot 1: cumulative net biogas volume --------------------------------
+    # --- plot 1: cumulative net biogas volume ----------------------------
     p1 <- ggplot2::ggplot(
       df_daily |>
-        dplyr::mutate(messplatz = factor(messplatz)) |>
+        dplyr::mutate(
+          messplatz = factor(messplatz, levels = ordered_levels)
+        ) |>
         dplyr::filter(probe == i),
-      ggplot2::aes(x = day, y = vol_norm_net_cum, colour = messplatz)
+      ggplot2::aes(
+        x = day,
+        y = vol_norm_net_cum,
+        colour = messplatz
+      )
     ) +
       ggplot2::geom_line() +
       ggplot2::labs(
@@ -56,20 +74,26 @@ plot_qc <- function(df_daily, df_abbruch) {
         y     = "Cumulative net volume [mL]"
       ) +
       ggplot2::theme(
-        plot.title        = ggplot2::element_text(hjust = 0.5),
-        legend.title      = ggplot2::element_blank(),
-        legend.position   = "inside",
-        legend.position.inside = c(0.8, 0.2)
+        plot.title              = ggplot2::element_text(hjust = 0.5),
+        legend.title            = ggplot2::element_blank(),
+        legend.position         = "inside",
+        legend.position.inside  = c(0.8, 0.2)
       )
 
     print(p1)
 
-    # --- plot 2: daily rate as % of cumulative (termination criterion) ------
+    # --- plot 2: daily rate as % of cumulative ---------------------------
     p2 <- ggplot2::ggplot(
       df_abbruch |>
-        dplyr::mutate(messplatz = factor(messplatz)) |>
+        dplyr::mutate(
+          messplatz = factor(messplatz, levels = ordered_levels)
+        ) |>
         dplyr::filter(probe == i),
-      ggplot2::aes(x = day, y = vol_perc, colour = messplatz)
+      ggplot2::aes(
+        x = day,
+        y = vol_perc,
+        colour = messplatz
+      )
     ) +
       ggplot2::geom_line() +
       ggplot2::geom_hline(
@@ -84,12 +108,15 @@ plot_qc <- function(df_daily, df_abbruch) {
         name   = "Daily vol / cumulative vol [%]",
         expand = ggplot2::expansion(mult = c(0, 0.01))
       ) +
-      ggplot2::labs(title = i, x = "Day") +
+      ggplot2::labs(
+        title = i,
+        x     = "Day"
+      ) +
       ggplot2::theme(
-        plot.title        = ggplot2::element_text(hjust = 0.5),
-        legend.title      = ggplot2::element_blank(),
-        legend.position   = "inside",
-        legend.position.inside = c(0.8, 0.2)
+        plot.title              = ggplot2::element_text(hjust = 0.5),
+        legend.title            = ggplot2::element_blank(),
+        legend.position         = "inside",
+        legend.position.inside  = c(0.8, 0.2)
       )
 
     print(p2)

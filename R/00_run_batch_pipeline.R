@@ -75,7 +75,8 @@ run_batch_pipeline <- function(
 
   message("[8/8] Computing yields and validity check...")
   df_yields   <- calc_yields(df_daily, termination_result$condition)
-  df_validity <- check_validity(df_yields, analytik_result$proben)
+  df_validity <- check_validity(df_yields$yields_daily, analytik_result$proben)
+  plot_qc(df_daily, termination_result$abbruch)
 
   list(
     analytik     = analytik_result$analytik,
@@ -85,7 +86,10 @@ run_batch_pipeline <- function(
     condition    = termination_result$condition,
     abbruch      = termination_result$abbruch,
     abbruch_wide = termination_result$abbruch_wide,
-    yields       = df_yields,
+    yields_daily = df_yields$yields_daily,
+    yields       = df_yields$yields,
     validity     = df_validity
   )
+
+
 }
