@@ -16,7 +16,6 @@ results <- run_batch_pipeline(
   bad_channels = character(0)
 )
 
-plot_qc(results$daily, results$abbruch)
 # stepwise processing --------------------------------------------------------------
 raw_analytik <- import_analytik_batch(path = path_test)
 
@@ -57,9 +56,12 @@ tibble::view(results$yields)
 
 # export ------------------------------------------------------------------
 
-# rds...list
-
 path_output <- stringr::str_c("output/", stringr::str_extract(basename(dirname((getwd()))), "^GT_\\d{4}_\\d{2}"))
+
+readr::write_rds(
+  results,
+  file = stringr::str_c(path_output, "_results.rds")
+)
 
 readr::write_rds(
   df_results_individuals_daily,
