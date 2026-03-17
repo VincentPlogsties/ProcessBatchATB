@@ -4,14 +4,14 @@
 \alias{check_validity}
 \title{Check replicate validity per VDI 4630}
 \usage{
-check_validity(df_yields, df_samples)
+check_validity(yields_daily, df_samples)
 }
 \arguments{
-\item{df_yields}{A tibble as returned by \code{\link[=calc_yields]{calc_yields()}}, containing final
-cumulative volumes per measurement position.}
-
 \item{df_samples}{A tibble as returned by \code{\link[=import_samples]{import_samples()}}, used to
 obtain the \code{variante} column for grouping.}
+
+\item{df_yields}{A tibble as returned by \code{\link[=calc_yields]{calc_yields()}}, containing final
+cumulative volumes per measurement position.}
 }
 \value{
 A tibble with one row per pair of replicates per variant per trough,

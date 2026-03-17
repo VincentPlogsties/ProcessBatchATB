@@ -31,9 +31,9 @@
 #' }
 #'
 #' @export
-check_validity <- function(df_yields, df_samples) {
+check_validity <- function(yields_daily, df_samples) {
 
-  finals <- df_yields |>
+  finals <- yields_daily |>
     dplyr::group_by(projekt, messplatz, probe) |>
     dplyr::summarise(
       biogas_yield_odm = dplyr::last(biogas_yield_odm),

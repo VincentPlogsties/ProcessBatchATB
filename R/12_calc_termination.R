@@ -2,8 +2,8 @@
 #'
 #' Determines when each substrate variant has met the stop condition defined
 #' in VDI 4630: the daily specific biogas production rate drops to ≤ 0.5% of
-#' the cumulative production per day for **three consecutive days**, and this
-#' condition is met only after **day 25** of the assay.
+#' the cumulative production per day for **three consecutive days** with a minimum
+#' test duration of **25 days**.
 #'
 #' @section Algorithm:
 #' 1. For each measurement position, compute `vol_perc` = daily volume as a
@@ -99,7 +99,7 @@ calc_termination <- function(df_gas, df_daily) {
         dplyr::lag(condition_variant, default = FALSE) == TRUE &
           dplyr::lag(condition_variant, n = 2, default = FALSE) == TRUE &
           dplyr::lag(condition_variant, n = 3, default = FALSE) == TRUE &
-          dplyr::lag(day, default = TRUE) > 25,
+          dplyr::lag(day, default = TRUE) >= 25,
         FALSE,
         TRUE
       ),

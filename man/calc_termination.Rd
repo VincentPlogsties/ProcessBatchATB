@@ -29,8 +29,8 @@ per \code{messplatz}. Useful for export.}
 \description{
 Determines when each substrate variant has met the stop condition defined
 in VDI 4630: the daily specific biogas production rate drops to ≤ 0.5\% of
-the cumulative production per day for \strong{three consecutive days}, and this
-condition is met only after \strong{day 25} of the assay.
+the cumulative production per day for \strong{three consecutive days} with a minimum
+test duration of \strong{25 days}.
 }
 \section{Algorithm}{
 
