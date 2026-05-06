@@ -49,6 +49,4 @@ df_proben   <- result$proben
 }
 \seealso{
 \code{\link[=import_analytik_batch]{import_analytik_batch()}}, \code{\link[=import_samples]{import_samples()}},
-\code{\link[ProcessLabAssistant:clean_analytik]{ProcessLabAssistant::clean_analytik()}},
-\code{\link[ProcessLabAssistant:transform_analytik]{ProcessLabAssistant::transform_analytik()}}
 }

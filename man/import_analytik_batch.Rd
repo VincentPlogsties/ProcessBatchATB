@@ -4,29 +4,21 @@
 \alias{import_analytik_batch}
 \title{Import analytics export files for a batch assay}
 \usage{
-import_analytik_batch(
-  path = "data",
-  pattern = "Analysen.*\\\\.xlsx$",
-  dedup_col = "probennummer"
-)
+import_analytik_batch(path = "data", pattern = "(Analyik|Analysen).*\\\\.rds$")
 }
 \arguments{
 \item{path}{Character scalar. Path to the directory containing the
 analytics export files. Default \code{"Data"}}
 
 \item{pattern}{Regular expression to match analytics files. Matching is
-case-insensitive. Default \code{"Analysen.*\\\\.xlsx$"}.}
-
-\item{dedup_col}{Character scalar. Column used for deduplication.
-Default \code{"probennummer"}. Passed through to
-\code{\link[ProcessLabAssistant:import_analytik]{ProcessLabAssistant::import_analytik()}}.}
+case-insensitive. Default \code{"(Analytik|Analysen).*\\\\.rds$"}.}
 }
 \value{
-A tibble with all unique rows from all matched files, all columns
+A tibble with all rows from all matched files, all columns
 character type. Pass directly to \code{\link[=process_analytik]{process_analytik()}}.
 }
 \description{
-A thin wrapper around \code{\link[ProcessLabAssistant:import_analytik]{ProcessLabAssistant::import_analytik()}} with a
+Imports \pkg{ProcessLabAssistant} output \code{.rds} files, using a
 default file pattern matching and path.
 }
 \examples{

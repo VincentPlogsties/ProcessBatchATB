@@ -26,8 +26,6 @@
 #' }
 #'
 #' @seealso [import_analytik_batch()], [import_samples()],
-#'   [ProcessLabAssistant::clean_analytik()],
-#'   [ProcessLabAssistant::transform_analytik()]
 #'
 #' @examples
 #' \dontrun{

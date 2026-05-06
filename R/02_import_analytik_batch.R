@@ -1,6 +1,6 @@
 #' Import analytics export files for a batch assay
 #'
-#' imports output .rds files of pkg. [ProcessLabAssistant] with a
+#' Imports \pkg{ProcessLabAssistant} output \code{.rds} files, using a
 #' default file pattern matching and path.
 #'
 #' @param path Character scalar. Path to the directory containing the
