@@ -43,8 +43,8 @@ process_analytik <- function(df_import_analytik, df_samples) {
 
   # --- clean & transform via ProcessLabAssistant ---------------------------
   analytik_all <- df_import_analytik |>
-    ProcessLabAssistant::clean_analytik() |>
-    ProcessLabAssistant::transform_analytik() |>
+    # ProcessLabAssistant::clean_analytik() |>
+    # ProcessLabAssistant::transform_analytik() |>
     dplyr::group_by(datum, probenart, probe) |>
     dplyr::summarise(
       analytik_nr = dplyr::if_else(

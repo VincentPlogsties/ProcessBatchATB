@@ -1,6 +1,6 @@
 Package: ProcessBatchATB
 Title: Process Batch Fermentation (BMP) Assay Data
-Version: 0.1.0
+Version: 1.1.0
 Authors@R:
     person("Given", "Family", , "email@example.com", role = c("aut", "cre"))
 Description: Provides a reproducible pipeline for processing batch fermentation
@@ -9,14 +9,13 @@ Description: Provides a reproducible pipeline for processing batch fermentation
     import of sample protocols and gas measurement sheets, calculates normalised
     biogas and methane volumes, applies blank correction, evaluates the VDI 4630
     termination criterion, and summarises daily and cumulative yields per
-    substrate. Analytics data (inoculum composition, substrate characterisation)
-    is processed via the ProcessLabAssistant package.
+    substrate. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Imports:
-    ProcessLabAssistant,
+
     dplyr,
     forcats,
     tidyr,
@@ -28,8 +27,7 @@ Imports:
     tibble,
     rlang,
     ggplot2
-Remotes:
-    https://github.com/VincentPlogsties/ProcessLabAssistantATB.git
+
 Suggests:
     testthat (>= 3.0.0),
     knitr,

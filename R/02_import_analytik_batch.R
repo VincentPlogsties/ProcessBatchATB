@@ -1,17 +1,14 @@
 #' Import analytics export files for a batch assay
 #'
-#' A thin wrapper around [ProcessLabAssistant::import_analytik()] with a
+#' imports output .rds files of pkg. [ProcessLabAssistant] with a
 #' default file pattern matching and path.
 #'
 #' @param path Character scalar. Path to the directory containing the
 #'   analytics export files. Default `"Data"`
 #' @param pattern Regular expression to match analytics files. Matching is
-#'   case-insensitive. Default `"Analysen.*\\.xlsx$"`.
-#' @param dedup_col Character scalar. Column used for deduplication.
-#'   Default `"probennummer"`. Passed through to
-#'   [ProcessLabAssistant::import_analytik()].
+#'   case-insensitive. Default `"(Analytik|Analysen).*\\.rds$"`.
 #'
-#' @return A tibble with all unique rows from all matched files, all columns
+#' @return A tibble with all rows from all matched files, all columns
 #'   character type. Pass directly to [process_analytik()].
 #'
 #' @seealso [process_analytik()], [import_samples()], [import_gaswerte()]
@@ -22,14 +19,42 @@
 #' }
 #'
 #' @export
+# import_analytik_batch <- function(
+#     path      = "data",
+#     pattern   = "Analysen.*\\.xlsx$",
+#     dedup_col = "probennummer"
+# ) {
+#   ProcessLabAssistant::import_analytik(
+#     path      = path,
+#     pattern   = pattern,
+#     dedup_col = dedup_col
+#   )
+# }
+
 import_analytik_batch <- function(
-    path      = "data",
-    pattern   = "Analysen.*\\.xlsx$",
-    dedup_col = "probennummer"
+    path    = "data",
+    pattern = "(Analyik|Analysen).*\\.rds$"
 ) {
-  ProcessLabAssistant::import_analytik(
-    path      = path,
-    pattern   = pattern,
-    dedup_col = dedup_col
+  files <- list.files(
+    path = path,
+    pattern = pattern,
+    full.names = TRUE,
+    ignore.case = TRUE
   )
+
+  # exclude temporary lock files
+  files <- files[!stringr::str_detect(basename(files), "^~\\$")]
+
+  if (length(files) == 0) {
+    rlang::abort(
+      c("No matching files found.",
+        i = paste0("Directory: ", path),
+        i = paste0("Pattern:   ", pattern))
+    )
+  }
+
+  files |>
+    purrr::map(\(f) readRDS(f)$data
+    ) |>
+    dplyr::bind_rows()
 }

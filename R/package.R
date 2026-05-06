@@ -2,11 +2,9 @@
 #'
 #' @description
 #' A pipeline for batch fermentation (BMP) assay data following VDI 4630.
-#' Analytics data (substrate characterisation, inoculum) is handled via
-#' \pkg{ProcessLabAssistant}. This package covers everything downstream:
 #'
-#' 1. **Import** – sample protocol sheets and raw gas measurement workbooks.
-#' 2. **Process analytics** – via \pkg{ProcessLabAssistant}, then compute
+#' 1. **Import** – sample protocol sheets, chemical analytics data and raw gas measurement workbooks.
+#' 2. **Process analytics** – compute
 #'    inoculum blank means and join substrate dry-matter values.
 #' 3. **Gas calculations** – normalised volume, blank correction,
 #'    cumulative biogas and methane per measurement position.
@@ -19,8 +17,8 @@
 #' @section Main functions:
 #' * [import_samples()] – read sample protocol sheet
 #' * [import_gaswerte()] – read gas measurement sheets (w1–w6)
-#' * [process_analytik()] – clean/transform analytics via ProcessLabAssistant,
-#'   compute inoculum blank mean, join to sample table
+#' * [import_analytik_batch()] - read analytic data (.rds output of pkg. ProcessLabAssistant)
+#' * [process_analytik()] – compute inoculum blank mean, join to sample table
 #' * [calc_gasvol()] – normalised volume, blank correction, cumulative sums
 #' * [calc_termination()] – VDI 4630 termination criterion
 #' * [calc_yields()] – daily biogas and methane yields per ODM
