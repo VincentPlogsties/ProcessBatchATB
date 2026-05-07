@@ -21,7 +21,7 @@
 #' @export
 # import_analytik_batch <- function(
 #     path      = "data",
-#     pattern   = "Analysen.*\\.xlsx$",
+#     pattern   = "(Analytik|Analysen).*\\.rds$",
 #     dedup_col = "probennummer"
 # ) {
 #   ProcessLabAssistant::import_analytik(
@@ -33,7 +33,7 @@
 
 import_analytik_batch <- function(
     path    = "data",
-    pattern = "(Analyik|Analysen).*\\.rds$"
+    pattern = "(Analytik|Analysen).*\\.rds$"
 ) {
   files <- list.files(
     path = path,
