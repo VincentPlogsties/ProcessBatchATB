@@ -8,9 +8,7 @@
 \description{
 A pipeline for batch fermentation (BMP) assay data following VDI 4630.
 \enumerate{
-\item \strong{Import} – sample protocol sheets, chemical analytics data and raw gas measurement workbooks.
-\item \strong{Process analytics} – compute
-inoculum blank means and join substrate dry-matter values.
+\item \strong{Import} – sample protocol sheets and raw gas measurement workbooks.
 \item \strong{Gas calculations} – normalised volume, blank correction,
 cumulative biogas and methane per measurement position.
 \item \strong{Termination criterion} – VDI 4630 stop condition
@@ -25,8 +23,6 @@ cumulative biogas and methane per measurement position.
 \itemize{
 \item \code{\link[=import_samples]{import_samples()}} – read sample protocol sheet
 \item \code{\link[=import_gaswerte]{import_gaswerte()}} – read gas measurement sheets (w1–w6)
-\item \code{\link[=import_analytik_batch]{import_analytik_batch()}} - read analytic data (.rds output of pkg. ProcessLabAssistant)
-\item \code{\link[=process_analytik]{process_analytik()}} – compute inoculum blank mean, join to sample table
 \item \code{\link[=calc_gasvol]{calc_gasvol()}} – normalised volume, blank correction, cumulative sums
 \item \code{\link[=calc_termination]{calc_termination()}} – VDI 4630 termination criterion
 \item \code{\link[=calc_yields]{calc_yields()}} – daily biogas and methane yields per ODM
@@ -42,6 +38,11 @@ Verein Deutscher Ingenieure, Düsseldorf.
 }
 \author{
 \strong{Maintainer}: Given Family \email{email@example.com}
+
+Authors:
+\itemize{
+  \item Given Family \email{email@example.com}
+}
 
 }
 \keyword{internal}

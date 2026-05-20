@@ -3,22 +3,20 @@
 #' Computes pairwise deviations between all replicate measurement positions
 #' within each substrate variant and trough (`wanne`). VDI 4630 requires that
 #' the deviation between any two replicates does not exceed defined thresholds
-#' (typically < 5–15% depending on the number of replicates and gas volume).
+#' (typically < 5–20% depending on the homogeneity of the substrate).
 #'
 #' All pairwise combinations are generated with [utils::combn()], so the
 #' function works for 2 or more replicates. For single-replicate positions, the
 #' position ID is returned with `NA` deviation values.
 #'
-#' @param df_yields A tibble as returned by [calc_yields()], containing final
+#' @param df_yields$yields A tibble as returned by [calc_yields()], containing final
 #'   cumulative volumes per measurement position.
-#' @param df_samples A tibble as returned by [import_samples()], used to
-#'   obtain the `variante` column for grouping.
 #'
 #' @return A tibble with one row per pair of replicates per variant per trough,
 #'   containing columns `projekt`, `probe`, `wanne`, `pruefglied` (pair of
-#'   `messplatz` IDs), `mean_BG` (mean cumulative biogas of the pair),
-#'   `diff_BG` (absolute difference), and `diff_mean_perc` (relative
-#'   difference in %).
+#'   `messplatz` IDs), `biogas_mean` and `ch4_mean`  (mean cumulative biogas yield and mean methane content of the pair),
+#'   `biogas_diff` and `ch4_diff`(absolute difference of the pair), `biogas_dev_pct` and `ch4_dev_pct` (relative
+#'   difference of the pair in %).
 #'
 #' @references
 #' VDI 4630 (2016), Section 5.3.4.
@@ -27,43 +25,41 @@
 #'
 #' @examples
 #' \dontrun{
-#' validity <- check_validity(df_yields, df_samples)
+#' validity <- check_validity(df_yields$yields)
 #' }
 #'
 #' @export
-check_validity <- function(yields_daily, df_samples) {
+check_validity <- function(yields) {
 
-  finals <- yields_daily |>
-    dplyr::group_by(projekt, messplatz, probe) |>
-    dplyr::summarise(
-      biogas_yield_odm = dplyr::last(biogas_yield_odm),
-      .groups = "drop"
-    ) |>
-    dplyr::left_join(
-      dplyr::select(df_samples, dplyr::any_of(c("messplatz", "wanne", "variante"))),
-      by = "messplatz"
-    )
-
-  finals |>
+  yields |>
     dplyr::group_by(projekt, probe, wanne) |>
     dplyr::reframe(
-      pruefglied = list(
+      pruefglied  = list(
         if (dplyr::n() > 1)
           utils::combn(messplatz, 2, paste0, collapse = "-")
         else messplatz
       ),
-      mean_BG = list(
-        if (dplyr::n() > 1)
-          utils::combn(biogas_yield_odm, 2, mean)
-        else biogas_yield_odm
+      biogas_mean = list(
+        if (dplyr::n() > 1) utils::combn(biogas_yield_fm, 2, mean)
+        else biogas_yield_fm
       ),
-      diff_BG = list(
-        if (dplyr::n() > 1)
-          abs(utils::combn(biogas_yield_odm, 2, diff))
+      biogas_diff = list(
+        if (dplyr::n() > 1) abs(utils::combn(biogas_yield_fm, 2, diff))
+        else NA_real_
+      ),
+      ch4_mean    = list(
+        if (dplyr::n() > 1) utils::combn(methane_perc, 2, mean)
+        else methane_perc
+      ),
+      ch4_diff    = list(
+        if (dplyr::n() > 1) abs(utils::combn(methane_perc, 2, diff))
         else NA_real_
       )
     ) |>
     tidyr::drop_na() |>
-    tidyr::unnest(cols = c(pruefglied, mean_BG, diff_BG)) |>
-    dplyr::mutate(diff_mean_perc = diff_BG / mean_BG * 100)
+    tidyr::unnest(cols = c(pruefglied, biogas_mean, biogas_diff, ch4_mean, ch4_diff)) |>
+    dplyr::mutate(
+      biogas_dev_pct = biogas_diff / biogas_mean * 100,
+      ch4_dev_pct    = ch4_diff    / ch4_mean    * 100
+    )
 }

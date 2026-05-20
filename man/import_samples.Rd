@@ -4,7 +4,7 @@
 \alias{import_samples}
 \title{Import sample protocol sheet}
 \usage{
-import_samples(path = "data")
+import_samples(path = ".")
 }
 \arguments{
 \item{path}{Character scalar. Path to the protocol \code{.xlsx} file.
@@ -13,7 +13,7 @@ Default \code{"Data"}. Finds files with pattern = \code{"Protokoll.*\\\\.xlsx$"}
 \value{
 A tibble with one row per sample position. Key columns include
 \code{wanne}, \code{platz},  \code{messplatz}, \code{probe}, \code{analytik_nr},
-\code{einwaage_in_g_fm}, \code{otm_k_fm}, and \code{d_gasmaus_cm}.
+\code{einwaage_in_g_fm} and \code{d_gasmaus_cm}.
 }
 \description{
 Reads the \code{"Proben"} sheet from the protocol XLSX-File of standard ATB Biogas Batch Test,
@@ -27,5 +27,5 @@ samples <- import_samples("data/Protokoll_VersuchXY.xlsx")
 
 }
 \seealso{
-\code{\link[=import_gaswerte]{import_gaswerte()}}, \code{\link[=process_analytik]{process_analytik()}}, \code{\link[=run_batch_pipeline]{run_batch_pipeline()}}
+\code{\link[=import_gaswerte]{import_gaswerte()}}, \code{\link[=run_batch_pipeline]{run_batch_pipeline()}}
 }

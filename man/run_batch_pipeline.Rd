@@ -5,17 +5,14 @@
 \title{Run the full batch fermentation pipeline}
 \usage{
 run_batch_pipeline(
-  protokoll_path = "data",
-  analytik_path = "data",
-  bad_channels = character(0)
+  protokoll_path = ".",
+  bad_channels = character(0),
+  export_xlsx = FALSE
 )
 }
 \arguments{
 \item{protokoll_path}{Character scalar. Path to the protocol \code{.xlsx} file
-containing both the sample sheet and gas measurement sheets. Default \code{"Data"}.}
-
-\item{analytik_path}{Character scalar. Path to the directory containing
-\code{Analysen*.xlsx} files, passed to \code{\link[=import_analytik_batch]{import_analytik_batch()}}. Default \code{"Data"}.}
+containing both the sample sheet and gas measurement sheets. Default \code{"."}.}
 
 \item{bad_channels}{Character vector. Measurement positions to exclude.
 Default \code{character(0)}.}
@@ -23,8 +20,7 @@ Default \code{character(0)}.}
 \value{
 A named list with elements:
 \describe{
-\item{\code{analytik}}{Processed analytics tibble from \code{\link[=process_analytik]{process_analytik()}}.}
-\item{\code{proben}}{Sample table with joined TS values from \code{\link[=process_analytik]{process_analytik()}}.}
+\item{\code{proben}}{Sample table.}
 \item{\code{gas}}{Full per-timestamp gas data from \code{\link[=calc_gasvol]{calc_gasvol()}}.}
 \item{\code{daily}}{Daily summaries from \code{\link[=calc_daily]{calc_daily()}}.}
 \item{\code{condition}}{Termination criterion flags (\verb{$condition} from \code{\link[=calc_termination]{calc_termination()}}).}
@@ -36,15 +32,14 @@ A named list with elements:
 }
 \description{
 Convenience wrapper that calls all pipeline steps in sequence:
-\code{\link[=import_analytik_batch]{import_analytik_batch()}}, \code{\link[=import_samples]{import_samples()}}, \code{\link[=import_gaswerte]{import_gaswerte()}},
-\code{\link[=process_analytik]{process_analytik()}}, \code{\link[=calc_gasvol]{calc_gasvol()}}, \code{\link[=calc_daily]{calc_daily()}},
+\code{\link[=import_samples]{import_samples()}},
+\code{\link[=calc_gasvol]{calc_gasvol()}}, \code{\link[=calc_daily]{calc_daily()}},
 \code{\link[=calc_termination]{calc_termination()}}, \code{\link[=calc_yields]{calc_yields()}}, and \code{\link[=check_validity]{check_validity()}}.
 }
 \examples{
 \dontrun{
 results <- run_batch_pipeline(
-  protokoll_path = "data/Protokoll_VersuchXY.xlsx",
-  analytik_path  = "data/Analysen",
+  protokoll_path = "./GT_JJJ_##_Protokoll.xlsx",
   bad_channels   = c("w1-1", "w3-12")
 )
 

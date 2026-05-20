@@ -13,15 +13,14 @@ library(ProcessBatchATB)
 # single pipeline processing ------------------------------------
 
 results <- run_batch_pipeline(
-  protokoll_path = "data",
-  analytik_path = "data",
-  bad_channels = character(0)
+  protokoll_path = ".",
+  bad_channels = character(0),
+  export_xlsx = FALSE # in addition to standard .rds file
 )
 
 # stepwise processing --------------------------------------------------------------
-raw_analytik <- import_analytik_batch(path = path_test)
 
-samples <- import_samples(path = path_test)
+samples <- import_samples(path = ".")
 
 gaswerte <- import_gaswerte(path = path_test)
 

@@ -4,13 +4,13 @@
 #' combines them, reshapes from wide (one column per measurement position) to
 #' long format, and parses timestamps.
 #'
-#' Each sheet is expected to have the same fixed layout starting at row 6
+#' Each sheet is expected to have the same fixed layout with data starting at row 6
 #' (`range = "A6:BQ71"`), with columns in the order: date, time, pressure,
 #' temperature, tub (`wanne`), followed by five repeated columns per
 #' measurement position (height mm, CH4%, CO2%, O2%, H2S ppm) for positions 1–13.
 #'
 #' @param path Character scalar. Path to the protocol `.xlsx` file.
-#' Default `"Data"`
+#' Default `"."` (project root folder)
 #'
 #' @param excel_origin Character scalar. Date origin for numeric dates.
 #'   Defaults to Excel `"1899-12-30"`.
@@ -28,7 +28,7 @@
 #' }
 #'
 #' @export
-import_gaswerte <- function(path = "data", date_origin = "1899-12-30")
+import_gaswerte <- function(path = ".", date_origin = "1899-12-30")
 {
 
   protocol_file <- list.files(
@@ -43,12 +43,14 @@ import_gaswerte <- function(path = "data", date_origin = "1899-12-30")
   sheets = c("w1", "w2", "w3", "w4", "w5", "w6")
   sheets |>
     purrr::map(
-      ~ readxl::read_xlsx(
-        path      = file[1],
-        sheet     = .x,
-        range     = "A6:BQ71",
-        col_names = FALSE,
-        col_types = "numeric"
+      ~ suppressWarnings(
+        readxl::read_xlsx(
+          path      = file[1],
+          sheet     = .x,
+          range     = "A6:BQ71",
+          col_names = FALSE,
+          col_types = "numeric"
+        )
       ) |>
         dplyr::mutate(sheet_name = .x)
     ) |>

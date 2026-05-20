@@ -9,9 +9,9 @@
 #'
 #' @return A tibble with one row per sample position. Key columns include
 #'    `wanne`, `platz`,  `messplatz`, `probe`, `analytik_nr`,
-#'   `einwaage_in_g_fm`, `otm_k_fm`, and `d_gasmaus_cm`.
+#'   `einwaage_in_g_fm` and `d_gasmaus_cm`.
 #'
-#' @seealso [import_gaswerte()], [process_analytik()], [run_batch_pipeline()]
+#' @seealso [import_gaswerte()], [run_batch_pipeline()]
 #'
 #' @examples
 #' \dontrun{
@@ -19,7 +19,7 @@
 #' }
 #'
 #' @export
-import_samples <- function(path = "data")
+import_samples <- function(path = ".")
 {
   protocol_file <- list.files(
     path = path,
@@ -33,22 +33,22 @@ import_samples <- function(path = "data")
   readxl::read_xlsx(
     file[1],
     sheet = "Proben",
-    range = "A4:S82") |>
+    range = "A4:k82") |>
     dplyr::rename_with(
       ~ stringr::str_replace_all(
         .x,
-        c("ö" = "oe", "ä" = "ae", "ü" = "ue", "oTM" = "otm", "%" = "")
+        c("ö" = "oe", "ä" = "ae", "ü" = "ue")
       )
     ) |>
     janitor::clean_names() |>
     tidyr::drop_na(einwaage_in_g_fm) |>
     dplyr::mutate(
       dplyr::across(
-        -c(platz, gasmaus, d_gasmaus_cm, einwaage_in_g_fm, otm_k_fm),
+        -c(platz, gasmaus, d_gasmaus_cm, einwaage_in_g_fm),
         as.character
       ),
       dplyr::across(
-        c(platz, gasmaus, d_gasmaus_cm, nullpunkt_cm, einwaage_in_g_fm, otm_k_fm),
+        c(platz, gasmaus, d_gasmaus_cm, nullpunkt_cm, einwaage_in_g_fm),
         as.numeric
       ),
       projekt = stringr::str_to_lower(projekt) |> stringr::str_squish()

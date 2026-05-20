@@ -39,7 +39,7 @@
 #' @references
 #' VDI 4630 (2016), Section 5.3.3.
 #'
-#' @seealso [calc_daily()], [calc_yields()]
+#' @seealso [calc_gasvol()], [calc_daily()], [calc_yields()]
 #'
 #' @examples
 #' \dontrun{

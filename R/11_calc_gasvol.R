@@ -3,8 +3,8 @@
 #' Takes the combined gas measurement and sample data and computes:
 #'
 #' 1. **Normalisation factor** – corrects for temperature and pressure
-#'    deviations from standard conditions (0 °C, 1013.25 hPa) using the
-#'    water vapour pressure formula applied in the protocol.
+#'    deviations from standard conditions (0 °C, 1013.25 hPa) using an empiric
+#'    water vapour pressure formula (pw = -4.3965 + 9.7962 * exp(0.0521 * temp)).
 #' 2. **Incremental normalised volume** (`vol_norm`) – change in bell height
 #'    multiplied by cylinder cross-section and normalisation factor.
 #' 3. **Blank correction** (`vol_norm_net`) – subtracts the mean of all
@@ -13,15 +13,15 @@
 #'    (case-insensitive). Blank positions themselves retain their raw
 #'    `vol_norm`.
 #' 4. **Corrected methane fraction** (`methane_perc`) – CH4% / (CH4% + CO2%)
-#'    to remove dilution artefacts; `NA` when either is zero.
+#'     `NA` when no measurement.
 #' 5. **Cumulative volumes** and **cumulative methane** per measurement
 #'    position.
 #' 6. **Run time** in days (from first measurement per position).
 #'
 #' @param df_gaswerte A tibble as returned by [import_gaswerte()].
-#' @param df_proben A tibble as returned by [process_analytik()]`$proben`,
+#' @param df_proben A tibble as returned by [import_samples()],
 #'   containing `wanne`, `platz`, `probe`, `messplatz`, `d_gasmaus_cm`,
-#'   `nullpunkt_cm`, `einwaage_in_g_fm`, `otm_k_fm`.
+#'   `nullpunkt_cm`, `einwaage_in_g_fm`.
 #' @param bad_channels Character vector of `messplatz` identifiers to exclude
 #'   from all calculations (e.g. positions with equipment failures).
 #'   Default `character(0)`.
@@ -32,7 +32,7 @@
 #'   `vol_norm_net_methan` (incremental), `vol_norm_net_methan_cum`, and
 #'   `run_time` (days).
 #'
-#' @seealso [import_gaswerte()], [process_analytik()], [calc_termination()]
+#' @seealso [import_samples()], [import_gaswerte()], [calc_termination()]
 #'
 #' @examples
 #' \dontrun{
@@ -45,11 +45,7 @@
 calc_gasvol <- function(df_gaswerte, df_proben, bad_channels = character(0)) {
 
   # --- join sample metadata to gas readings --------------------------------
-  df <- dplyr::select(
-    df_proben,
-    projekt, wanne, platz, probe, messplatz,
-    d_gasmaus_cm, nullpunkt_cm, analytik_nr, einwaage_in_g_fm, otm_k_fm
-  ) |>
+  df <- df_proben |>
     dplyr::right_join(df_gaswerte, by = c("wanne", "platz")) |>
     tidyr::drop_na(probe)
 
@@ -60,19 +56,25 @@ calc_gasvol <- function(df_gaswerte, df_proben, bad_channels = character(0)) {
   df <- df |>
     dplyr::group_by(messplatz) |>
     dplyr::mutate(
-      normfaktor = (druck - (-4.3965 + 9.7962 * exp(0.0521 * temp))) *
-        273.15 / (1013.25 * (273.15 + temp)),
-      h_2   = (hoehe_mm / 10) - nullpunkt_cm,
-      h_1   = (dplyr::lag(hoehe_mm) / 10) - nullpunkt_cm,
-      A_zyl = pi * (d_gasmaus_cm / 2)^2,
+
+      .t_norm = 273.15,
+      .p_norm = 1013.25,
+      # .p_vapour = 6.11231 * exp(17.5043 * temp / (241.2 + temp)), # magnus correction from VDI4630 (2016)
+      .p_vapour = -4.3965 + 9.7962 * exp(0.0521 * temp),            # legacy formula from ATB Batch tests
+      normfaktor = (druck - .p_vapour) * .t_norm / (.p_norm * (.t_norm + temp)),
+
+      .h_2   = (hoehe_mm / 10) - nullpunkt_cm,
+      .h_1   = (dplyr::lag(hoehe_mm) / 10) - nullpunkt_cm,
+      .A_zyl = pi * (d_gasmaus_cm / 2)^2,
+
       vol_norm = dplyr::if_else(
         is.na(dplyr::lag(ch4_perc)),
-        h_2 * A_zyl * normfaktor - h_1 * dplyr::lag(A_zyl) * dplyr::lag(normfaktor),
-        h_2 * A_zyl * normfaktor
+        .h_2 * .A_zyl * normfaktor - .h_1 * dplyr::lag(.A_zyl) * dplyr::lag(normfaktor),
+        .h_2 * .A_zyl * normfaktor
       ),
       vol_norm = tidyr::replace_na(vol_norm, 0)
     ) |>
-    dplyr::select(-c(h_2, h_1, A_zyl))
+    dplyr::select(-tidyr::starts_with("."))
 
   # --- blank mean per wanne per timestamp ----------------------------------
   blank_means <- df |>

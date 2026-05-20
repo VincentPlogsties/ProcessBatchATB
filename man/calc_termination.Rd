@@ -64,5 +64,5 @@ result$abbruch_wide  # vol_perc per position per day, wide format
 VDI 4630 (2016), Section 5.3.3.
 }
 \seealso{
-\code{\link[=calc_daily]{calc_daily()}}, \code{\link[=calc_yields]{calc_yields()}}
+\code{\link[=calc_gasvol]{calc_gasvol()}}, \code{\link[=calc_daily]{calc_daily()}}, \code{\link[=calc_yields]{calc_yields()}}
 }

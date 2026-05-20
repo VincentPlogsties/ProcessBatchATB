@@ -4,11 +4,11 @@
 \alias{import_gaswerte}
 \title{Import gas measurement sheets}
 \usage{
-import_gaswerte(path = "data", date_origin = "1899-12-30")
+import_gaswerte(path = ".", date_origin = "1899-12-30")
 }
 \arguments{
 \item{path}{Character scalar. Path to the protocol \code{.xlsx} file.
-Default \code{"Data"}}
+Default \code{"."} (project root folder)}
 
 \item{excel_origin}{Character scalar. Date origin for numeric dates.
 Defaults to Excel \code{"1899-12-30"}.}
@@ -25,7 +25,7 @@ combines them, reshapes from wide (one column per measurement position) to
 long format, and parses timestamps.
 }
 \details{
-Each sheet is expected to have the same fixed layout starting at row 6
+Each sheet is expected to have the same fixed layout with data starting at row 6
 (\code{range = "A6:BQ71"}), with columns in the order: date, time, pressure,
 temperature, tub (\code{wanne}), followed by five repeated columns per
 measurement position (height mm, CH4\%, CO2\%, O2\%, H2S ppm) for positions 1–13.

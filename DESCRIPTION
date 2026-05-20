@@ -1,6 +1,6 @@
 Package: ProcessBatchATB
 Title: Process Batch Fermentation (BMP) Assay Data
-Version: 1.1.0
+Version: 2.0.0
 Authors@R:
     person("Given", "Family", , "email@example.com", role = c("aut", "cre"))
 Description: Provides a reproducible pipeline for processing batch fermentation
@@ -13,7 +13,6 @@ Description: Provides a reproducible pipeline for processing batch fermentation
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 Imports:
     dplyr,
     forcats,
@@ -25,10 +24,12 @@ Imports:
     janitor,
     tibble,
     rlang,
-    ggplot2
+    ggplot2,
+    openxlsx
 Suggests:
     testthat (>= 3.0.0),
     knitr,
     rmarkdown
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+Config/roxygen2/version: 8.0.0

@@ -9,9 +9,9 @@ calc_gasvol(df_gaswerte, df_proben, bad_channels = character(0))
 \arguments{
 \item{df_gaswerte}{A tibble as returned by \code{\link[=import_gaswerte]{import_gaswerte()}}.}
 
-\item{df_proben}{A tibble as returned by \code{\link[=process_analytik]{process_analytik()}}\verb{$proben},
+\item{df_proben}{A tibble as returned by \code{\link[=import_samples]{import_samples()}},
 containing \code{wanne}, \code{platz}, \code{probe}, \code{messplatz}, \code{d_gasmaus_cm},
-\code{nullpunkt_cm}, \code{einwaage_in_g_fm}, \code{otm_k_fm}.}
+\code{nullpunkt_cm}, \code{einwaage_in_g_fm}.}
 
 \item{bad_channels}{Character vector of \code{messplatz} identifiers to exclude
 from all calculations (e.g. positions with equipment failures).
@@ -30,8 +30,8 @@ Takes the combined gas measurement and sample data and computes:
 \details{
 \enumerate{
 \item \strong{Normalisation factor} – corrects for temperature and pressure
-deviations from standard conditions (0 °C, 1013.25 hPa) using the
-water vapour pressure formula applied in the protocol.
+deviations from standard conditions (0 °C, 1013.25 hPa) using an empiric
+water vapour pressure formula (pw = -4.3965 + 9.7962 * exp(0.0521 * temp)).
 \item \strong{Incremental normalised volume} (\code{vol_norm}) – change in bell height
 multiplied by cylinder cross-section and normalisation factor.
 \item \strong{Blank correction} (\code{vol_norm_net}) – subtracts the mean of all
@@ -40,7 +40,7 @@ point. Blank positions are identified by \code{probe} matching \code{"blind"}
 (case-insensitive). Blank positions themselves retain their raw
 \code{vol_norm}.
 \item \strong{Corrected methane fraction} (\code{methane_perc}) – CH4\% / (CH4\% + CO2\%)
-to remove dilution artefacts; \code{NA} when either is zero.
+\code{NA} when no measurement.
 \item \strong{Cumulative volumes} and \strong{cumulative methane} per measurement
 position.
 \item \strong{Run time} in days (from first measurement per position).
@@ -55,5 +55,5 @@ df_gas   <- calc_gasvol(gaswerte, result$proben, bad_channels = c("W1-3"))
 
 }
 \seealso{
-\code{\link[=import_gaswerte]{import_gaswerte()}}, \code{\link[=process_analytik]{process_analytik()}}, \code{\link[=calc_termination]{calc_termination()}}
+\code{\link[=import_samples]{import_samples()}}, \code{\link[=import_gaswerte]{import_gaswerte()}}, \code{\link[=calc_termination]{calc_termination()}}
 }

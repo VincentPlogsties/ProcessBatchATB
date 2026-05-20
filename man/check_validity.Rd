@@ -4,27 +4,24 @@
 \alias{check_validity}
 \title{Check replicate validity per VDI 4630}
 \usage{
-check_validity(yields_daily, df_samples)
+check_validity(yields)
 }
 \arguments{
-\item{df_samples}{A tibble as returned by \code{\link[=import_samples]{import_samples()}}, used to
-obtain the \code{variante} column for grouping.}
-
-\item{df_yields}{A tibble as returned by \code{\link[=calc_yields]{calc_yields()}}, containing final
+\item{df_yields$yields}{A tibble as returned by \code{\link[=calc_yields]{calc_yields()}}, containing final
 cumulative volumes per measurement position.}
 }
 \value{
 A tibble with one row per pair of replicates per variant per trough,
 containing columns \code{projekt}, \code{probe}, \code{wanne}, \code{pruefglied} (pair of
-\code{messplatz} IDs), \code{mean_BG} (mean cumulative biogas of the pair),
-\code{diff_BG} (absolute difference), and \code{diff_mean_perc} (relative
-difference in \%).
+\code{messplatz} IDs), \code{biogas_mean} and \code{ch4_mean}  (mean cumulative biogas yield and mean methane content of the pair),
+\code{biogas_diff} and \code{ch4_diff}(absolute difference of the pair), \code{biogas_dev_pct} and \code{ch4_dev_pct} (relative
+difference of the pair in \%).
 }
 \description{
 Computes pairwise deviations between all replicate measurement positions
 within each substrate variant and trough (\code{wanne}). VDI 4630 requires that
 the deviation between any two replicates does not exceed defined thresholds
-(typically < 5–15\% depending on the number of replicates and gas volume).
+(typically < 5–20\% depending on the homogeneity of the substrate).
 }
 \details{
 All pairwise combinations are generated with \code{\link[utils:combn]{utils::combn()}}, so the
@@ -33,7 +30,7 @@ position ID is returned with \code{NA} deviation values.
 }
 \examples{
 \dontrun{
-validity <- check_validity(df_yields, df_samples)
+validity <- check_validity(df_yields$yields)
 }
 
 }

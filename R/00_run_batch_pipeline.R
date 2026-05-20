@@ -1,21 +1,18 @@
 #' Run the full batch fermentation pipeline
 #'
 #' Convenience wrapper that calls all pipeline steps in sequence:
-#' [import_analytik_batch()], [import_samples()], [import_gaswerte()],
-#' [process_analytik()], [calc_gasvol()], [calc_daily()],
+#' [import_samples()],
+#' [calc_gasvol()], [calc_daily()],
 #' [calc_termination()], [calc_yields()], and [check_validity()].
 #'
 #' @param protokoll_path Character scalar. Path to the protocol `.xlsx` file
-#'   containing both the sample sheet and gas measurement sheets. Default `"Data"`.
-#' @param analytik_path Character scalar. Path to the directory containing
-#'   `Analysen*.xlsx` files, passed to [import_analytik_batch()]. Default `"Data"`.
+#'   containing both the sample sheet and gas measurement sheets. Default `"."`.
 #' @param bad_channels Character vector. Measurement positions to exclude.
 #'   Default `character(0)`.
 #'
 #' @return A named list with elements:
 #' \describe{
-#'   \item{`analytik`}{Processed analytics tibble from [process_analytik()].}
-#'   \item{`proben`}{Sample table with joined TS values from [process_analytik()].}
+#'   \item{`proben`}{Sample table.}
 #'   \item{`gas`}{Full per-timestamp gas data from [calc_gasvol()].}
 #'   \item{`daily`}{Daily summaries from [calc_daily()].}
 #'   \item{`condition`}{Termination criterion flags (`$condition` from [calc_termination()]).}
@@ -28,8 +25,7 @@
 #' @examples
 #' \dontrun{
 #' results <- run_batch_pipeline(
-#'   protokoll_path = "data/Protokoll_VersuchXY.xlsx",
-#'   analytik_path  = "data/Analysen",
+#'   protokoll_path = "./GT_JJJ_##_Protokoll.xlsx",
 #'   bad_channels   = c("w1-1", "w3-12")
 #' )
 #'
@@ -45,51 +41,44 @@
 # devtools::test()       # runs the tests in tests/testthat/
 
 run_batch_pipeline <- function(
-    protokoll_path = "data",
-    analytik_path  = "data",
-    bad_channels     = character(0)
+    protokoll_path = ".",
+    bad_channels     = character(0),
+    export_xlsx = FALSE # in addition to standard .rds file
 )
-  {
+{
   message("=== ProcessBatchATB Pipeline ===")
 
-  message("[1/8] Importing analytics...")
-  raw_analytik <- import_analytik_batch(path = analytik_path)
-
-  message("[2/8] Importing sample protocol...")
+  message("1/7] Importing sample protocol...")
   samples <- import_samples(protokoll_path)
 
-  message("[3/8] Importing gas measurements...")
+  message("[2/7] Importing gas measurements...")
   gaswerte <- import_gaswerte(protokoll_path)
 
-  message("[4/8] Processing analytics...")
-  analytik_result <- process_analytik(raw_analytik, samples)
+  message("[3/7] Calculating normalised gas volumes...")
+  df_gas <- calc_gasvol(gaswerte, samples, bad_channels = bad_channels)
 
-  message("[5/8] Calculating normalised gas volumes...")
-  df_gas <- calc_gasvol(gaswerte, analytik_result$proben, bad_channels = bad_channels)
-
-  message("[6/8] Aggregating daily summaries...")
+  message("[4/7] Aggregating daily summaries...")
   df_daily <- calc_daily(df_gas)
 
-  message("[7/8] Evaluating VDI 4630 termination criterion...")
+  message("[5/7] Evaluating VDI 4630 termination criterion...")
   termination_result <- calc_termination(df_gas, df_daily)
 
-  message("[8/8] Computing yields and validity check...")
+  message("[6/7] Computing yields and validity check...")
   df_yields   <- calc_yields(df_daily, termination_result$condition)
-  df_validity <- check_validity(df_yields$yields_daily, analytik_result$proben)
+  df_validity <- check_validity(df_yields$yields)
   plot_qc(df_daily, termination_result$abbruch)
 
-  list(
-    analytik     = analytik_result$analytik,
-    proben       = analytik_result$proben,
-    gas          = df_gas,
-    daily        = df_daily,
-    condition    = termination_result$condition,
-    abbruch      = termination_result$abbruch,
-    abbruch_wide = termination_result$abbruch_wide,
+  results <- list(
+
     yields_daily = df_yields$yields_daily,
     yields       = df_yields$yields,
-    validity     = df_validity
+    validity     = df_validity,
+    abbruch      = termination_result$abbruch,
+    abbruch_wide = termination_result$abbruch_wide
+
   )
+  message("[7/7] Exporting results...")
+  export_data(results, path = protokoll_path, write_xlsx = export_xlsx)
 
 
 }
