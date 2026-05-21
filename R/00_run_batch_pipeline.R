@@ -61,7 +61,7 @@ run_batch_pipeline <- function(
   df_daily <- calc_daily(df_gas)
 
   message("[5/7] Evaluating VDI 4630 termination criterion...")
-  termination_result <- calc_termination(df_gas, df_daily)
+  termination_result <- calc_termination(df_daily)
 
   message("[6/7] Computing yields and validity check...")
   df_yields   <- calc_yields(df_daily, termination_result$condition)
@@ -69,14 +69,13 @@ run_batch_pipeline <- function(
   plot_qc(df_daily, termination_result$abbruch)
 
   results <- list(
-
     yields_daily = df_yields$yields_daily,
     yields       = df_yields$yields,
     validity     = df_validity,
     abbruch      = termination_result$abbruch,
     abbruch_wide = termination_result$abbruch_wide
-
   )
+
   message("[7/7] Exporting results...")
   export_data(results, path = protokoll_path, write_xlsx = export_xlsx)
 

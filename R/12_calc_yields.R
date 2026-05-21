@@ -13,7 +13,7 @@
 #' \describe{
 #'   \item{`yields_daily`}{Tibble of daily values filtered to
 #'     `keep_values == TRUE`, with additional columns `biogas_yield_fm`
-#'     (mL/g VS), `methane_yield_fm` (mL/g VS), and `methane_perc` (%).}
+#'     (mL/g), `methane_yield_fm` (mL/g), and `methane_perc` (%).}
 #'   \item{`yields`}{Tibble of final summarised values per measurement
 #'     position (`last` day per `messplatz`), with the same yield columns
 #'     as `yields_daily`.}
@@ -50,7 +50,7 @@ calc_yields <- function(df_daily, df_termination) {
       ))
     )
   yields <- yields_daily |>
-    dplyr::group_by(projekt, wanne, platz, messplatz, analytik_nr, probe)|>
+    dplyr::group_by(gaertest, projekt, wanne, platz, messplatz, analytik_nr, probe)|>
     dplyr::summarise(
       dplyr::across(
         c("day", "methane_perc", "biogas_yield_fm", "methane_yield_fm"),

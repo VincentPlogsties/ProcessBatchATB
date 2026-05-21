@@ -4,14 +4,11 @@
 \alias{calc_termination}
 \title{Evaluate the VDI 4630 termination criterion}
 \usage{
-calc_termination(df_gas, df_daily)
+calc_termination(df_daily)
 }
 \arguments{
-\item{df_gas}{A tibble as returned by \code{\link[=calc_gasvol]{calc_gasvol()}}, used to obtain
-\code{run_time} per \verb{(messplatz, datum)}.}
-
 \item{df_daily}{A tibble as returned by \code{\link[=calc_daily]{calc_daily()}}, containing
-\code{wanne}, \code{platz}, \code{messplatz}, \code{probe}, \code{datum}, \code{day},
+\code{wanne}, \code{platz}, \code{messplatz}, \code{probe}, \code{datum}, \code{day}, \code{run_time}
 \code{vol_norm_net}, and \code{vol_norm_net_cum}.}
 }
 \value{

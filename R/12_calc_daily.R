@@ -7,8 +7,8 @@
 #' @param df_gas A tibble as returned by [calc_gasvol()].
 #'
 #' @return A tibble with one row per `(messplatz, datum)` containing daily
-#'   and cumulative normalised biogas and methane volumes, the `day` counter,
-#'   and identifier columns (`projekt`, `wanne`, `platz`, `probe`,
+#'   and cumulative normalised biogas and methane volumes, the `day` and `run_time` counter,
+#'   and identifier columns (`gaertest`, `projekt`, `wanne`, `platz`, `probe`,
 #'   `einwaage_in_g_fm`).
 #'
 #' @seealso [calc_gasvol()], [calc_termination()], [calc_yields()]
@@ -22,10 +22,11 @@
 calc_daily <- function(df_gas) {
   df_gas |>
     dplyr::group_by(
-      projekt, wanne, platz, messplatz, analytik_nr, probe,
+      gaertest, projekt, wanne, platz, messplatz, analytik_nr, probe,
       einwaage_in_g_fm, datum
     ) |>
     dplyr::summarise(
+      run_time            = dplyr::last(run_time),
       vol_norm            = sum(vol_norm),
       blind_mean          = sum(blind_mean),
       vol_norm_net        = sum(vol_norm_net),
@@ -41,7 +42,7 @@ calc_daily <- function(df_gas) {
       day = cumsum(
         as.numeric(datum - dplyr::lag(datum, default = dplyr::first(datum)))
       ),
-      .before = vol_norm,
+      .after = datum,
       vol_norm_net_cum = cumsum(vol_norm_net),
       vol_norm_net_methan_cum = {
         x <- tidyr::replace_na(vol_norm_net_methan, 0) |> cumsum()
@@ -59,6 +60,5 @@ calc_daily <- function(df_gas) {
     dplyr::ungroup() |>
     dplyr::select(-dplyr::any_of(c("blind_mean", "vol_norm")))
 }
-
 
 

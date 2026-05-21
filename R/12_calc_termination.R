@@ -19,10 +19,8 @@
 #'    once `continue_test` flips to `FALSE` for a variant, all subsequent
 #'    days are also `FALSE` And will not be considered in the evaluation.
 #'
-#' @param df_gas A tibble as returned by [calc_gasvol()], used to obtain
-#'   `run_time` per `(messplatz, datum)`.
 #' @param df_daily A tibble as returned by [calc_daily()], containing
-#'   `wanne`, `platz`, `messplatz`, `probe`, `datum`, `day`,
+#'   `wanne`, `platz`, `messplatz`, `probe`, `datum`, `day`, `run_time`
 #'   `vol_norm_net`, and `vol_norm_net_cum`.
 #'
 #' @return A named list with three elements:
@@ -51,18 +49,12 @@
 #' }
 #'
 #' @export
-calc_termination <- function(df_gas, df_daily) {
+calc_termination <- function(df_daily) {
 
   # --- step 1: vol_perc per measurement position ---------------------------
   df_abbruch <- df_daily |>
-    dplyr::select(wanne, platz, messplatz, probe, datum, day,
+    dplyr::select(wanne, platz, messplatz, probe, datum, day, run_time,
                   vol_norm_net, vol_norm_net_cum) |>
-    dplyr::filter(!stringr::str_detect(probe, "blind_w")) |>
-    dplyr::left_join(
-      dplyr::select(df_gas, messplatz, datum, run_time),
-      by = c("messplatz", "datum"),
-      multiple = "last"
-    ) |>
     dplyr::group_by(messplatz) |>
     dplyr::mutate(
       vol_perc = dplyr::if_else(
@@ -76,6 +68,7 @@ calc_termination <- function(df_gas, df_daily) {
 
   # --- step 2: wide format for inspection / export -------------------------
   abbruch_wide <- df_abbruch |>
+    dplyr::filter(!stringr::str_detect(stringr::str_to_lower(probe), "blind w")) |>
     dplyr::arrange(wanne, platz) |>
     tidyr::pivot_wider(
       id_cols     = c("datum", "day"),
@@ -106,6 +99,14 @@ calc_termination <- function(df_gas, df_daily) {
       # propagate stop forward: all days after first FALSE are also FALSE
       keep_values = dplyr::cumall(continue_test)
     ) |>
+    # blind samples should always be kept
+    dplyr::mutate(
+      keep_values = dplyr::if_else(
+        stringr::str_detect(stringr::str_to_lower(probe), "blind w"),
+        TRUE,
+        keep_values
+      )
+    )|>
     dplyr::ungroup()
 
   list(condition = condition, abbruch_wide = abbruch_wide, abbruch = df_abbruch)

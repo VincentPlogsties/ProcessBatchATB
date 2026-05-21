@@ -11,8 +11,8 @@ calc_daily(df_gas)
 }
 \value{
 A tibble with one row per \verb{(messplatz, datum)} containing daily
-and cumulative normalised biogas and methane volumes, the \code{day} counter,
-and identifier columns (\code{projekt}, \code{wanne}, \code{platz}, \code{probe},
+and cumulative normalised biogas and methane volumes, the \code{day} and \code{run_time} counter,
+and identifier columns (\code{gaertest}, \code{projekt}, \code{wanne}, \code{platz}, \code{probe},
 \code{einwaage_in_g_fm}).
 }
 \description{

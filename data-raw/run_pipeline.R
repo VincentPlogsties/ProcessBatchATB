@@ -2,9 +2,9 @@
 
 # install.packages("devtools")
 
-library(devtools)
-devtools::load_all()
-devtools::document()
+# library(devtools)
+# devtools::load_all()
+# devtools::document()
 
 devtools::install_github("https://github.com/VincentPlogsties/ProcessBatchATB.git")
 
@@ -13,59 +13,44 @@ library(ProcessBatchATB)
 # single pipeline processing ------------------------------------
 
 results <- run_batch_pipeline(
-  protokoll_path = ".",
-  bad_channels = character(0),
-  export_xlsx = FALSE # in addition to standard .rds file
+  protokoll_path = ".",            # default = R-Project folder -> (".")
+  bad_channels = character(0),     # example: c("w1-1", "w6-3")
+  export_xlsx = FALSE              # in addition to standard .rds file
 )
 
 # stepwise processing --------------------------------------------------------------
 
 samples <- import_samples(path = ".")
 
-gaswerte <- import_gaswerte(path = path_test)
+gaswerte <- import_gaswerte(path = ".")
 
-analytik_result <- process_analytik(raw_analytik, samples)
-
-df_gas <- calc_gasvol(gaswerte, analytik_result$proben, bad_channels = character(0))
+df_gas <- calc_gasvol(gaswerte, bad_channels = character(0))
 
 df_daily <- calc_daily(df_gas)
 
-termination_result <- calc_termination(df_gas, df_daily)
+termination_result <- calc_termination(df_daily)
 
 df_yields   <- calc_yields(df_daily, termination_result$condition)
 
-df_validity <- check_validity(df_yields$yields_daily, analytik_result$proben)
+df_validity <- check_validity(df_yields$yields)
 
 plot_qc(df_daily, termination_result$abbruch)
 
 results <- list(
-  analytik     = analytik_result$analytik,
-  proben       = analytik_result$proben,
-  gas          = df_gas,
-  daily        = df_daily,
-  condition    = termination_result$condition,
-  abbruch_wide = termination_result$abbruch_wide,
   yields_daily = df_yields$yields_daily,
   yields       = df_yields$yields,
-  validity     = df_validity
+  validity     = df_validity,
+  abbruch      = termination_result$abbruch,
+  abbruch_wide = termination_result$abbruch_wide
 )
+
+# export to rds -----------------------------------------------------------
+
+export_data(results, path = ".", write_xlsx = FALSE)
 
 # view results--------------------------------------------------------------
 tibble::view(results$abbruch_wide)
 tibble::view(results$df_validity)
 tibble::view(results$yields)
 
-# export ------------------------------------------------------------------
-
-path_output <- stringr::str_c("output/", stringr::str_extract(basename(dirname((getwd()))), "^GT_\\d{4}_\\d{2}"))
-
-readr::write_rds(
-  results,
-  file = stringr::str_c(path_output, "_results.rds")
-)
-
-readr::write_rds(
-  df_results_individuals_daily,
-  file = stringr::str_c(path_output, "_results_individuals_daily.rds")
-)
 

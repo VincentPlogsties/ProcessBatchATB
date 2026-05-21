@@ -18,7 +18,7 @@ A named list with two elements:
 \describe{
 \item{\code{yields_daily}}{Tibble of daily values filtered to
 \code{keep_values == TRUE}, with additional columns \code{biogas_yield_fm}
-(mL/g VS), \code{methane_yield_fm} (mL/g VS), and \code{methane_perc} (\%).}
+(mL/g), \code{methane_yield_fm} (mL/g), and \code{methane_perc} (\%).}
 \item{\code{yields}}{Tibble of final summarised values per measurement
 position (\code{last} day per \code{messplatz}), with the same yield columns
 as \code{yields_daily}.}
