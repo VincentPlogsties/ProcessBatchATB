@@ -48,24 +48,26 @@ run_batch_pipeline <- function(
 {
   message("=== ProcessBatchATB Pipeline ===")
 
-  message("1/7] Importing sample protocol...")
+  message("1/8] Importing sample protocol...")
   samples <- import_samples(protokoll_path)
 
-  message("[2/7] Importing gas measurements...")
+  message("[2/8] Importing gas measurements...")
   gaswerte <- import_gaswerte(protokoll_path)
 
-  message("[3/7] Calculating normalised gas volumes...")
+  message("[3/8] Calculating normalised gas volumes...")
   df_gas <- calc_gasvol(gaswerte, samples, bad_channels = bad_channels)
 
-  message("[4/7] Aggregating daily summaries...")
+  message("[4/8] Aggregating daily summaries...")
   df_daily <- calc_daily(df_gas)
 
-  message("[5/7] Evaluating VDI 4630 termination criterion...")
+  message("[5/8] Evaluating VDI 4630 termination criterion...")
   termination_result <- calc_termination(df_daily)
 
-  message("[6/7] Computing yields and validity check...")
+  message("[6/8] Computing yields and validity check...")
   df_yields   <- calc_yields(df_daily, termination_result$condition)
   df_validity <- check_validity(df_yields$yields)
+
+  message("[7/8] plotting cummulative daily volumes...")
   plot_qc(df_daily, termination_result$abbruch)
 
   results <- list(
@@ -75,9 +77,8 @@ run_batch_pipeline <- function(
     abbruch      = termination_result$abbruch,
     abbruch_wide = termination_result$abbruch_wide
   )
-
-  message("[7/7] Exporting results...")
+  message("[8/8] Exporting results...")
   export_data(results, path = protokoll_path, write_xlsx = export_xlsx)
 
-
+  invisible(results)
 }

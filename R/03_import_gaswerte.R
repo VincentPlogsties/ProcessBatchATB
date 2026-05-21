@@ -49,7 +49,8 @@ import_gaswerte <- function(path = ".", date_origin = "1899-12-30")
           sheet     = .x,
           range     = "A6:BQ71",
           col_names = FALSE,
-          col_types = "numeric"
+          col_types = "numeric",
+          .name_repair = "unique_quiet"
         )
       ) |>
         dplyr::mutate(sheet_name = .x)
