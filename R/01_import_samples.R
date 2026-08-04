@@ -33,7 +33,7 @@ import_samples <- function(path = ".")
   readxl::read_xlsx(
     file[1],
     sheet = "Proben",
-    range = "A4:k82") |>
+    range = "A4:k121") |>
     dplyr::rename_with(
       ~ stringr::str_replace_all(
         .x,
