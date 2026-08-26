@@ -41,6 +41,7 @@ import_gaswerte <- function(path = ".", date_origin = "1899-12-30")
   file <- protocol_file[!stringr::str_detect(basename(protocol_file), "^~\\$")]
 
   # use only sheets with "w" followed by a number to catch only sheets with trial data
+  sheets <- readxl::excel_sheets(file)
   sheets <- sheets[stringr::str_detect(sheets, "w\\d+")]
 
   sheets |>
