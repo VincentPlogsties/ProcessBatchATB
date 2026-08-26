@@ -6,7 +6,7 @@
 # devtools::load_all()
 # devtools::document()
 
-devtools::install_github("https://github.com/VincentPlogsties/ProcessBatchATB.git")
+remotes::install_github("git@github.com:VincentPlogsties/ProcessEnsilingATB.git")
 
 library(ProcessBatchATB)
 
