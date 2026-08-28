@@ -44,13 +44,13 @@ calc_yields <- function(df_daily, df_termination) {
     ) |>
     dplyr::select(
       -dplyr::any_of(c(
-        "einwaage_in_g_fm",
+        # "einwaage_in_g_fm",
         "vol_norm_net", "vol_norm_net_methan",
         "vol_norm_net_cum", "vol_norm_net_methan_cum"
       ))
     )
   yields <- yields_daily |>
-    dplyr::group_by(gaertest, projekt, wanne, platz, messplatz, analytik_nr, probe)|>
+    dplyr::group_by(gaertest, projekt, wanne, platz, messplatz, analytik_nr, einwaage_in_g_fm, probe)|>
     dplyr::summarise(
       dplyr::across(
         c("day", "methane_perc", "biogas_yield_fm", "methane_yield_fm"),

@@ -40,7 +40,10 @@ import_gaswerte <- function(path = ".", date_origin = "1899-12-30")
   # exclude Excel temporary lock file
   file <- protocol_file[!stringr::str_detect(basename(protocol_file), "^~\\$")]
 
-  sheets = c("w1", "w2", "w3", "w4", "w5", "w6")
+  # use only sheets with "w" followed by a number to catch only sheets with trial data
+  sheets <- readxl::excel_sheets(file)
+  sheets <- sheets[stringr::str_detect(sheets, "w\\d+")]
+
   sheets |>
     purrr::map(
       ~ suppressWarnings(
