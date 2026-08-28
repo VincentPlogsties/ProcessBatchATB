@@ -3,3 +3,5 @@
 ^.*\.Rproj$
 ^README\.Rmd$
 ^LICENSE\.md$
+^\.positai$
+^\.claude$
