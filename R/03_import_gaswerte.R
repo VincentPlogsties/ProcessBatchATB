@@ -82,10 +82,23 @@ import_gaswerte <- function(path = ".", date_origin = "1899-12-30")
       .keep   = "unused"
     ) |>
     tidyr::drop_na(zeit, hoehe_mm) |>
+    (\(d) {
+      bad <- d$zeit >= 1
+      if (any(bad)) {
+        rlang::warn(c(
+          "Time cells contain a date component; only the time of day is used.",
+          i = paste0("Sheet/date: ",
+                     unique(paste(d$wanne[bad],
+                                  lubridate::as_date(d$datum[bad], origin = date_origin))),
+                     collapse = ", ")
+        ))
+      }
+      d
+    })() |>
     dplyr::mutate(
       datum = lubridate::as_date(datum, origin = date_origin),
       zeit  = lubridate::as_datetime(
-        datum + lubridate::seconds_to_period(zeit * 86400)
+        datum + lubridate::seconds_to_period((zeit %% 1) * 86400)
       )
     )
 }
